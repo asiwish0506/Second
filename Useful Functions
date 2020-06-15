@@ -47,7 +47,14 @@ plt.xticks(rotation='90')
 sns.barplot(x=all_data_na.index, y=all_data_na)
 plt.xlabel('Features', fontsize=15)
 plt.ylabel('Percent of missing values', fontsize=15)
-plt.title('Percent missing data by feature', fontsize=15)
+plt.title('Percent missing data by feature', fontsize=15
+
+# 카테고리, 수치형 데이터 나누기
+train_n=train[[c for c in train.columns if train[c].dtypes!='O']].copy()
+test_n=test[[c for c in test.columns if test[c].dtypes!='O']].copy()
+
+train_c=train[[c for c in train.columns if train[c].dtypes=='O']].copy()
+test_c=test[[c for c in test.columns if test[c].dtypes=='O']].copy()
 
 # 범주형 변수 요약보기
 train_df.describe(include=['O'])
@@ -131,3 +138,7 @@ g = g.set_ylabels("survival probability")
 
 # 크로스테이블 만들기
 pd.crosstab([data.Embarked,data.Pclass],[data.Sex,data.Survived],margins=True).style.background_gradient(cmap='summer_r')
+
+# seaborn colorplot
+sns.barplot(plt1[0],plt1.index,ax=ax[1],palette=sns.color_palette('inferno_r',15))
+
