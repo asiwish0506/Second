@@ -1,3 +1,76 @@
+# 버전 체크
+
+# This Python 3 environment comes with many helpful analytics libraries installed
+# It is defined by the kaggle/python docker image: https://github.com/kaggle/docker-python
+
+#load packages
+import sys #access to system parameters https://docs.python.org/3/library/sys.html
+print("Python version: {}". format(sys.version))
+
+import pandas as pd #collection of functions for data processing and analysis modeled after R dataframes with SQL like features
+print("pandas version: {}". format(pd.__version__))
+
+import matplotlib #collection of functions for scientific and publication-ready visualization
+print("matplotlib version: {}". format(matplotlib.__version__))
+
+import numpy as np #foundational package for scientific computing
+print("NumPy version: {}". format(np.__version__))
+
+import scipy as sp #collection of functions for scientific computing and advance mathematics
+print("SciPy version: {}". format(sp.__version__)) 
+
+import IPython
+from IPython import display #pretty printing of dataframes in Jupyter notebook
+print("IPython version: {}". format(IPython.__version__)) 
+
+import sklearn #collection of machine learning algorithms
+print("scikit-learn version: {}". format(sklearn.__version__))
+
+#misc libraries
+import random
+import time
+
+#ignore warnings
+import warnings
+warnings.filterwarnings('ignore')
+print('-'*25)
+
+# 결측치 비율 및 시각화
+
+all_data_na = (all_data.isnull().sum() / len(all_data)) * 100
+all_data_na = all_data_na.drop(all_data_na[all_data_na == 0].index).sort_values(ascending=False)[:30]
+missing_data = pd.DataFrame({'Missing Ratio' :all_data_na})
+missing_data.head(20)
+
+f, ax = plt.subplots(figsize=(15, 12))
+plt.xticks(rotation='90')
+sns.barplot(x=all_data_na.index, y=all_data_na)
+plt.xlabel('Features', fontsize=15)
+plt.ylabel('Percent of missing values', fontsize=15)
+plt.title('Percent missing data by feature', fontsize=15)
+
+# 범주형 변수 요약보기
+train_df.describe(include=['O'])
+
+# 범주형 변수 히스토그램 요약 그리기
+g = sns.FacetGrid(train_df, col='Survived')
+g.map(plt.hist, 'Age', bins=20)
+
+# 열 전체에 함수 적용하기
+train['Has_Cabin'] = train["Cabin"].apply(lambda x: 0 if type(x) == float else 1)
+
+# 혹은 두 변수를 동시에
+grid = sns.FacetGrid(train_df, col='Survived', row='Pclass', size=2.2, aspect=1.6)
+grid.map(plt.hist, 'Age', alpha=.5, bins=20)
+grid.add_legend();
+
+# 상관관계 
+
+sns.set()
+cols = ['SalePrice', 'OverallQual', 'GrLivArea', 'GarageCars', 'TotalBsmtSF', 'FullBath', 'YearBuilt']
+sns.pairplot(df_train[cols], size = 2.5)
+plt.show();
+
 # VIF 테이블 만들기
 
 from statsmodels.stats.outliers_influence import variance_inflation_factor
@@ -9,4 +82,52 @@ def checkVIF(X):
     vif = vif.sort_values(by = "VIF", ascending = False)
     return(vif)
     
+# 아웃라이어
+
+# Outlier detection 
+
+def detect_outliers(df,n,features):
+    """
+    Takes a dataframe df of features and returns a list of the indices
+    corresponding to the observations containing more than n outliers according
+    to the Tukey method.
+    """
+    outlier_indices = []
     
+    # iterate over features(columns)
+    for col in features:
+        # 1st quartile (25%)
+        Q1 = np.percentile(df[col], 25)
+        # 3rd quartile (75%)
+        Q3 = np.percentile(df[col],75)
+        # Interquartile range (IQR)
+        IQR = Q3 - Q1
+        
+        # outlier step
+        outlier_step = 1.5 * IQR
+        
+        # Determine a list of indices of outliers for feature col
+        outlier_list_col = df[(df[col] < Q1 - outlier_step) | (df[col] > Q3 + outlier_step )].index
+        
+        # append the found outlier indices for col to the list of outlier indices 
+        outlier_indices.extend(outlier_list_col)
+        
+    # select observations containing more than 2 outliers
+    outlier_indices = Counter(outlier_indices)        
+    multiple_outliers = list( k for k, v in outlier_indices.items() if v > n )
+    
+    return multiple_outliers   
+
+# detect outliers from Age, SibSp , Parch and Fare
+Outliers_to_drop = detect_outliers(train,2,["Age","SibSp","Parch","Fare"])
+
+
+# 이진 분류 문제 양성 비율 구하기 (분류 타깃값이 0,1이어야 함)
+
+g = sns.factorplot(x="SibSp",y="Survived",data=train,kind="bar", size = 6 , 
+palette = "muted")
+g.despine(left=True)
+g = g.set_ylabels("survival probability")
+
+# 크로스테이블 만들기
+pd.crosstab([data.Embarked,data.Pclass],[data.Sex,data.Survived],margins=True).style.background_gradient(cmap='summer_r')
