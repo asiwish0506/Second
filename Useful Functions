@@ -47,7 +47,7 @@ plt.xticks(rotation='90')
 sns.barplot(x=all_data_na.index, y=all_data_na)
 plt.xlabel('Features', fontsize=15)
 plt.ylabel('Percent of missing values', fontsize=15)
-plt.title('Percent missing data by feature', fontsize=15
+plt.title('Percent missing data by feature', fontsize=15)
 
 # 카테고리, 수치형 데이터 나누기
 train_n=train[[c for c in train.columns if train[c].dtypes!='O']].copy()
