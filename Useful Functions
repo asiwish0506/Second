@@ -179,5 +179,9 @@ def reduce_mem_usage(df):
  
  return df
 
+# corr table
 
+plt.figure(figsize=(14,12))
+corr = df.corr()
+sns.heatmap(corr, mask = corr <0.8, linewidth=0.5, cmap='Blues')
 
