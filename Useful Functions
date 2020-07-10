@@ -185,3 +185,7 @@ plt.figure(figsize=(14,12))
 corr = df.corr()
 sns.heatmap(corr, mask = corr <0.8, linewidth=0.5, cmap='Blues')
 
+
+# 데이터프레임 섞기
+df = df.sample(frac=1)
+
