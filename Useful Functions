@@ -216,3 +216,22 @@ ax[0].set_xlabel("특성 크기")
 ax[0].set_ylabel("빈도")
 ax[0].legend(["악성", "양성"], loc="best")
 fig.tight_layout()
+
+
+# data overview하기
+df_overview = data_overview(df)
+df_overview
+
+# ★
+from viz_utils import *
+from ml_utils import *
+from custom_transformers import *
+
+# 수치형 변수에 대해 간단하게 lineplot과 박스plot을 한 번에 그려줌
+numplot_analysis(df[num_cols], hue='risk', color_hue=color_list)
+
+# 비슷한 걸 카테고리형 변수에 대해 해줌
+cat_features = [col for col, dtype in df.dtypes.items() if dtype == 'object']
+catplot_analysis(df[cat_features], palette='plasma')
+
+catplot_percentage_analysis(df[cat_features], hue='risk', palette=rev_color_list)
